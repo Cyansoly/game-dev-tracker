@@ -1,0 +1,251 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Semantic surface colors — bind to CSS vars so theme switch works */
+  --color-base:     var(--bg-base);
+  --color-card:     var(--bg-card);
+  --color-raised:   var(--bg-raised);
+  --color-t1:       var(--text-1);
+  --color-t2:       var(--text-2);
+  --color-t3:       var(--text-3);
+  --color-bd:       var(--border-color);
+}
+
+/* ═══════════ DARK THEME (default) ═══════════ */
+:root {
+  --bg-base:     #09090b;
+  --bg-card:     #18181b;
+  --bg-raised:   #27272a;
+  --bg-overlay:  rgba(9, 9, 11, 0.88);
+  --bg-sidebar:  rgba(9, 9, 11, 0.92);
+
+  --border-color:       rgba(255, 255, 255, 0.07);
+  --border-color-hover: rgba(59, 130, 246, 0.30);
+
+  --text-1: #fafafa;
+  --text-2: #a1a1aa;
+  --text-3: #52525b;
+
+  --glow-hover-shadow:
+    0 0 0 1px rgba(59,130,246,0.08),
+    0 8px 32px rgba(0,0,0,0.50);
+
+  --grid-line: rgba(255, 255, 255, 0.018);
+  --selection-bg: rgba(59, 130, 246, 0.28);
+  --scrollbar-thumb: #3f3f46;
+  --scrollbar-thumb-hover: #52525b;
+
+  --status-done-bg: rgba(34,197,94,0.10);
+  --status-done-border: rgba(34,197,94,0.22);
+  --input-bg: #111113;
+}
+
+/* ═══════════ LIGHT THEME ═══════════ */
+.light {
+  --bg-base:     #f2f3f7;
+  --bg-card:     #ffffff;
+  --bg-raised:   #e8eaf1;
+  --bg-overlay:  rgba(242, 243, 247, 0.90);
+  --bg-sidebar:  rgba(242, 243, 247, 0.94);
+
+  --border-color:       rgba(0, 0, 0, 0.08);
+  --border-color-hover: rgba(59, 130, 246, 0.40);
+
+  --text-1: #18181b;
+  --text-2: #52525b;
+  --text-3: #a1a1aa;
+
+  --glow-hover-shadow:
+    0 0 0 1px rgba(59,130,246,0.12),
+    0 8px 24px rgba(0,0,0,0.10);
+
+  --grid-line: rgba(0, 0, 0, 0.04);
+  --selection-bg: rgba(59, 130, 246, 0.18);
+  --scrollbar-thumb: #c4c4cf;
+  --scrollbar-thumb-hover: #a1a1aa;
+
+  --status-done-bg: rgba(34,197,94,0.08);
+  --status-done-border: rgba(34,197,94,0.20);
+  --input-bg: #f8f9fc;
+
+  color-scheme: light;
+}
+
+/* ═══════════ Base Reset ═══════════ */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { height: 100%; }
+
+body {
+  min-height: 100%;
+  background-color: var(--bg-base);
+  color: var(--text-1);
+  font-family: var(--font-geist-sans, system-ui, sans-serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* ═══════════ Scrollbar ═══════════ */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+::-webkit-scrollbar-corner { background: transparent; }
+
+/* ═══════════ Selection ═══════════ */
+::selection {
+  background: var(--selection-bg);
+  color: var(--text-1);
+}
+
+/* ═══════════ Grid Background ═══════════ */
+.grid-bg {
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* ═══════════ GlowCard ═══════════ */
+.glow-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.25s ease;
+}
+.glow-card:hover {
+  border-color: var(--border-color-hover);
+  box-shadow: var(--glow-hover-shadow);
+}
+
+/* ═══════════ Progress ═══════════ */
+.progress-track {
+  background-color: var(--bg-raised);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.progress-fill {
+  border-radius: 99px;
+  transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ═══════════ Sidebar ═══════════ */
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+  text-decoration: none;
+}
+.sidebar-item:hover {
+  background-color: rgba(128,128,128,0.07);
+  color: var(--text-1);
+}
+.sidebar-item.active {
+  background-color: rgba(59, 130, 246, 0.12);
+  color: #60a5fa;
+}
+
+/* ═══════════ Badges ═══════════ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 99px;
+  text-transform: uppercase;
+}
+
+/* ═══════════ Tag Chip ═══════════ */
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  color: var(--text-2);
+}
+
+/* ═══════════ Monospace nums ═══════════ */
+.num {
+  font-family: var(--font-geist-mono, monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═══════════ Focus ═══════════ */
+:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 0.6);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ═══════════ Light mode: zinc text overrides ═══════════ */
+/*
+  Tailwind zinc-50/100/200/300 are near-white — invisible on light backgrounds.
+  Override them to use semantic text vars when .light is active.
+*/
+.light .text-zinc-50,
+.light .text-zinc-100,
+.light .text-zinc-200 {
+  color: var(--text-1);
+}
+.light .text-zinc-300 {
+  color: var(--text-2);
+}
+/* zinc-400/500/600 work on both backgrounds (medium grays) — leave as-is */
+
+/* Light mode: near-white backgrounds become raised surfaces */
+.light .bg-zinc-950 { background-color: var(--bg-base); }
+.light .bg-zinc-900 { background-color: var(--bg-card); }
+.light .bg-zinc-900\/70 { background-color: var(--bg-card); }
+.light .bg-zinc-900\/60 { background-color: var(--bg-card); }
+.light .bg-zinc-800 { background-color: var(--bg-raised); }
+.light .bg-zinc-800\/80 { background-color: var(--bg-raised); }
+.light .bg-zinc-800\/60 { background-color: var(--bg-raised); }
+
+/* White-opacity borders → themed border */
+.light .border-white\/\[0\.05\],
+.light .border-white\/\[0\.06\],
+.light .border-white\/\[0\.07\],
+.light .border-white\/\[0\.04\] {
+  border-color: var(--border-color);
+}
+
+/* Dashed empty-state borders */
+.light .border-dashed { border-color: var(--border-color); }
+
+/* ═══════════ Modal backdrop ═══════════ */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  z-index: 50;
+}
+
+/* ═══════════ Drag ghost ═══════════ */
+.drag-over-col {
+  outline: 2px dashed rgba(59, 130, 246, 0.4);
+  outline-offset: -2px;
+  border-radius: 12px;
+}
