@@ -59,6 +59,7 @@ export default function TagDistributionChart({ data }: TagDistributionChartProps
           <div className="relative w-full" style={{ height: 200, overflow: "hidden" }}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 <Pie
                   data={data}
                   cx="50%"
@@ -67,9 +68,8 @@ export default function TagDistributionChart({ data }: TagDistributionChartProps
                   outerRadius={90}
                   dataKey="minutes"
                   nameKey="tag"
-                  activeIndex={activeIdx}
-                  activeShape={renderActiveShape as never}
-                  onMouseEnter={(_, idx) => setActiveIdx(idx)}
+                  {...({ activeIndex: activeIdx, activeShape: renderActiveShape } as any)}
+                  onMouseEnter={(_: unknown, idx: number) => setActiveIdx(idx)}
                   onMouseLeave={() => setActiveIdx(undefined)}
                   paddingAngle={2}
                 >
