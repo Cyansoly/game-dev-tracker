@@ -13,6 +13,8 @@ export const translations = {
       analytics: "数据分析",
       tasks: "任务看板",
       settings: "设置",
+      inspirations: "灵感库",
+      milestones: "开发里程碑",
     },
 
     topNav: {
@@ -25,7 +27,9 @@ export const translations = {
         "/logs":       { title: "开发日志", desc: "开发日志时间线" },
         "/analytics":  { title: "数据分析", desc: "进度可视化分析" },
         "/tasks":      { title: "任务看板", desc: "任务管理" },
-        "/settings":   { title: "设置",     desc: "偏好设置与数据" },
+        "/settings":      { title: "设置",       desc: "偏好设置与数据" },
+        "/inspirations":  { title: "灵感库",     desc: "记录与管理制作灵感" },
+        "/milestones":    { title: "开发里程碑", desc: "成就与里程碑总览" },
       },
     },
 
@@ -154,6 +158,10 @@ export const translations = {
       noVersionsYet: "尚未记录版本",
       boardOf: "任务看板",
       logsOf: "开发日志",
+      ideas: "灵感",
+      ideasOf: "项目灵感",
+      noIdeasYet: "该项目暂无灵感记录",
+      addIdea: "新建灵感",
     },
 
     versionTags: {
@@ -223,6 +231,8 @@ export const translations = {
       analytics: "Analytics",
       tasks: "Tasks",
       settings: "Settings",
+      inspirations: "Idea Vault",
+      milestones: "Dev Milestones",
     },
 
     topNav: {
@@ -235,7 +245,9 @@ export const translations = {
         "/logs":       { title: "Dev Logs",  desc: "Development log timeline" },
         "/analytics":  { title: "Analytics", desc: "Progress visualization" },
         "/tasks":      { title: "Tasks",     desc: "Task board" },
-        "/settings":   { title: "Settings",  desc: "Preferences & data" },
+        "/settings":      { title: "Settings",       desc: "Preferences & data" },
+        "/inspirations":  { title: "Idea Vault",     desc: "Capture & manage dev ideas" },
+        "/milestones":    { title: "Dev Milestones", desc: "Achievements & milestone overview" },
       },
     },
 
@@ -364,6 +376,10 @@ export const translations = {
       noVersionsYet: "No versions recorded yet.",
       boardOf: "Task Board",
       logsOf: "Dev Logs",
+      ideas: "Ideas",
+      ideasOf: "Project Ideas",
+      noIdeasYet: "No ideas recorded for this project yet.",
+      addIdea: "New Idea",
     },
 
     versionTags: {

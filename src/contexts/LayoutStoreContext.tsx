@@ -23,18 +23,23 @@ export interface WidgetConfig {
 }
 
 const DEFAULT_LAYOUT: WidgetConfig[] = [
-  { id: "today-focus",     visible: true,  size: "xl", order: 0 },
-  { id: "active-projects", visible: true,  size: "xl", order: 1 },
-  { id: "streak",          visible: true,  size: "sm", order: 2 },
-  { id: "lifetime-stats",  visible: true,  size: "md", order: 3 },
-  { id: "weekly-rhythm",   visible: true,  size: "md", order: 4 },
-  { id: "task-focus",      visible: true,  size: "sm", order: 5 },
-  { id: "recent-logs",     visible: true,  size: "md", order: 6 },
-  { id: "heatmap",         visible: true,  size: "xl", order: 7 },
-  { id: "achievements",    visible: false, size: "xl", order: 8 },
+  // Row 1: 今日 (8 + 4 = 12)
+  { id: "today-focus",     visible: true, size: "lg", order: 0 },
+  { id: "streak",          visible: true, size: "sm", order: 1 },
+  // Row 2: 项目 (12)
+  { id: "active-projects", visible: true, size: "xl", order: 2 },
+  // Row 3: 总览上行 (8 + 4 = 12)
+  { id: "lifetime-stats",  visible: true, size: "lg", order: 3 },
+  { id: "task-focus",      visible: true, size: "sm", order: 4 },
+  // Row 4: 总览下行 (6 + 6 = 12)
+  { id: "weekly-rhythm",   visible: true, size: "md", order: 5 },
+  { id: "recent-logs",     visible: true, size: "md", order: 6 },
+  // Row 5-6: 活动与成就 (12 each)
+  { id: "heatmap",         visible: true, size: "xl", order: 7 },
+  { id: "achievements",    visible: true, size: "xl", order: 8 },
 ];
 
-const LS_KEY = "devtracker_layout_v1";
+const LS_KEY = "devtracker_layout_v2";
 
 interface LayoutCtxValue {
   widgets: WidgetConfig[];

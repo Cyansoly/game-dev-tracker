@@ -17,8 +17,11 @@ import InlineLinks from "@/components/inline/InlineLinks";
 import LogModal from "@/components/logs/LogModal";
 import type { DevLog as DevLogType } from "@/lib/types";
 import { LayoutGrid, BookOpen, GitBranch, CheckSquare, ChevronRight, Plus, Link2, Lightbulb, Zap } from "lucide-react";
+import IdeaCard from "@/components/inspirations/IdeaCard";
+import IdeaModal from "@/components/inspirations/IdeaModal";
+import { useIdeaStore } from "@/contexts/IdeaStoreContext";
 
-type TabId = "overview" | "logs" | "board" | "versions";
+type TabId = "overview" | "logs" | "board" | "versions" | "ideas";
 
 interface ProjectDetailTabsProps {
   project: GameProject;
@@ -37,6 +40,10 @@ export default function ProjectDetailTabs({ project, logs, tasks, versions }: Pr
 
   const [showLogModal, setShowLogModal] = useState(false);
   const [editLog, setEditLog] = useState<DevLogType | null>(null);
+  const [showIdeaModal, setShowIdeaModal] = useState(false);
+  const { ideas } = useIdeaStore();
+  const projectIdeas = ideas.filter((i) => i.projectId === project.id)
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
   const projectTasks = storeTasks.filter((t) => t.projectId === project.id);
 
@@ -49,6 +56,7 @@ export default function ProjectDetailTabs({ project, logs, tasks, versions }: Pr
     { id: "logs" as TabId,      label: d.devLogs,   icon: <BookOpen className="h-3.5 w-3.5" /> },
     { id: "board" as TabId,     label: d.board,     icon: <CheckSquare className="h-3.5 w-3.5" /> },
     { id: "versions" as TabId,  label: d.versions,  icon: <GitBranch className="h-3.5 w-3.5" /> },
+    { id: "ideas" as TabId,     label: d.ideas,     icon: <Lightbulb className="h-3.5 w-3.5" /> },
   ];
 
   return (
@@ -255,6 +263,36 @@ export default function ProjectDetailTabs({ project, logs, tasks, versions }: Pr
               )}
             </GlowCard>
           )}
+
+          {/* ── Ideas ── */}
+          {activeTab === "ideas" && (
+            <GlowCard>
+              <div className="mb-4 flex items-center justify-between">
+                <h4 className="text-sm font-semibold" style={{ color: "var(--text-2)" }}>
+                  {d.ideasOf} ({projectIdeas.length})
+                </h4>
+                <button
+                  onClick={() => setShowIdeaModal(true)}
+                  className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-white transition-colors"
+                  style={{ backgroundColor: project.coverColor }}
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  {d.addIdea}
+                </button>
+              </div>
+              {projectIdeas.length > 0 ? (
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {projectIdeas.map((idea, i) => (
+                    <IdeaCard key={idea.id} idea={idea} index={i} />
+                  ))}
+                </div>
+              ) : (
+                <p className="py-8 text-center text-sm" style={{ color: "var(--text-3)" }}>
+                  {d.noIdeasYet}
+                </p>
+              )}
+            </GlowCard>
+          )}
         </motion.div>
       </AnimatePresence>
 
@@ -264,6 +302,14 @@ export default function ProjectDetailTabs({ project, logs, tasks, versions }: Pr
           log={editLog}
           defaultProjectId={project.id}
           onClose={() => { setShowLogModal(false); setEditLog(null); }}
+        />
+      )}
+
+      {/* Idea modal */}
+      {showIdeaModal && (
+        <IdeaModal
+          defaultProjectId={project.id}
+          onClose={() => setShowIdeaModal(false)}
         />
       )}
     </div>

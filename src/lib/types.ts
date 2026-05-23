@@ -148,3 +148,25 @@ export interface Milestone {
   targetDate?: string;
   completedAt?: string;
 }
+
+export type IdeaCategory =
+  | "gameplay"
+  | "art"
+  | "story"
+  | "audio"
+  | "tech"
+  | "marketing"
+  | "other";
+
+export interface IdeaCapsule {
+  id: string;
+  projectId?: string;       // 未填 = 未归类
+  title: string;
+  content: string;
+  category?: IdeaCategory;
+  tags?: string[];
+  color?: string;
+  pinned?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}

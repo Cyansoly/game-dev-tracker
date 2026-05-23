@@ -3,21 +3,21 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard, Gamepad2, BookOpen, BarChart3, CheckSquare,
+  LayoutDashboard, Gamepad2, BookOpen, CheckSquare, Lightbulb,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/cn";
 
 export default function BottomNav() {
   const pathname = usePathname();
-  const { t } = useLanguage();
+  const { lang } = useLanguage();
 
   const items = [
-    { href: "/projects",  label: t.nav.projects,   icon: Gamepad2 },
-    { href: "/logs",      label: t.nav.devLogs,    icon: BookOpen },
-    { href: "/dashboard", label: t.nav.dashboard,  icon: LayoutDashboard },
-    { href: "/tasks",     label: t.nav.tasks,      icon: CheckSquare },
-    { href: "/analytics", label: t.nav.analytics,  icon: BarChart3 },
+    { href: "/projects",     label: lang === "zh" ? "项目"  : "Projects", icon: Gamepad2 },
+    { href: "/inspirations", label: lang === "zh" ? "灵感库" : "Ideas",    icon: Lightbulb },
+    { href: "/dashboard",    label: lang === "zh" ? "概览"  : "Dashboard", icon: LayoutDashboard },
+    { href: "/logs",         label: lang === "zh" ? "日志"  : "Logs",      icon: BookOpen },
+    { href: "/tasks",        label: lang === "zh" ? "任务"  : "Tasks",     icon: CheckSquare },
   ];
 
   return (
@@ -30,7 +30,9 @@ export default function BottomNav() {
       }}
     >
       {items.map(({ href, label, icon: Icon }) => {
-        const isActive = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
+        const isActive =
+          pathname === href ||
+          (href !== "/dashboard" && pathname.startsWith(href));
         return (
           <Link
             key={href}

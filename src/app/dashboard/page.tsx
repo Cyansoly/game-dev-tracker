@@ -52,9 +52,33 @@ function colSpan(size: string) {
     case "sm": return "col-span-12 md:col-span-4";
     case "md": return "col-span-12 md:col-span-6";
     case "lg": return "col-span-12 md:col-span-8";
+    case "xl":
     default:   return "col-span-12";
   }
 }
+
+/* Segment label shown above a group of widgets */
+function SegmentLabel({ label }: { label: string }) {
+  return (
+    <div className="col-span-12 flex items-center gap-3 pt-1">
+      <span
+        className="text-[10px] font-semibold uppercase tracking-widest"
+        style={{ color: "var(--text-3)" }}
+      >
+        {label}
+      </span>
+      <div className="flex-1 border-t" style={{ borderColor: "var(--border-color)" }} />
+    </div>
+  );
+}
+
+/* Segment boundary config — insert a label before widget at this order index */
+const SEGMENT_BEFORE: Record<number, { zh: string; en: string }> = {
+  0: { zh: "今日", en: "Today" },
+  2: { zh: "项目", en: "Projects" },
+  3: { zh: "总览", en: "Overview" },
+  7: { zh: "活动 & 成就", en: "Activity & Achievements" },
+};
 
 export default function DashboardPage() {
   const { widgets, setVisible, reset } = useLayoutStore();
@@ -87,7 +111,6 @@ export default function DashboardPage() {
               {zh ? "模块可点击右上角 ⋯ 调整大小或隐藏" : "Click ⋯ on any module to resize or hide"}
             </p>
           </div>
-          {/* Reset layout */}
           <button
             onClick={reset}
             className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-colors hover:bg-white/8"
@@ -99,23 +122,35 @@ export default function DashboardPage() {
           </button>
         </div>
 
-        {/* Widget grid */}
+        {/* Widget grid with segment labels */}
         <div className="grid grid-cols-12 gap-4">
-          <AnimatePresence>
-            {visible.map((cfg) => (
-              <motion.div
-                key={cfg.id}
-                className={colSpan(cfg.size)}
-                layout
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-              >
-                {WIDGET_MAP[cfg.id]}
-              </motion.div>
-            ))}
-          </AnimatePresence>
+          {visible.flatMap((cfg) => {
+            const seg = SEGMENT_BEFORE[cfg.order];
+            const items = [];
+            if (seg) {
+              items.push(
+                <SegmentLabel
+                  key={`seg-${cfg.order}`}
+                  label={zh ? seg.zh : seg.en}
+                />
+              );
+            }
+            items.push(
+              <AnimatePresence key={cfg.id}>
+                <motion.div
+                  className={colSpan(cfg.size)}
+                  layout
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  {WIDGET_MAP[cfg.id]}
+                </motion.div>
+              </AnimatePresence>
+            );
+            return items;
+          })}
         </div>
 
         {/* Hidden modules restore bar */}

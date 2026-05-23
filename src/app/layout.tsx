@@ -4,6 +4,7 @@ import "./globals.css";
 import AppShell from "@/components/layout/AppShell";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { PreferenceProvider } from "@/contexts/PreferenceContext";
 import { TaskStoreProvider } from "@/contexts/TaskStoreContext";
 import { LogStoreProvider } from "@/contexts/LogStoreContext";
 import { ProjectStoreProvider } from "@/contexts/ProjectStoreContext";
@@ -11,6 +12,7 @@ import { SearchProvider } from "@/contexts/SearchContext";
 import { VersionStoreProvider } from "@/contexts/VersionStoreContext";
 import { MilestoneProvider } from "@/contexts/MilestoneContext";
 import { LayoutStoreProvider } from "@/contexts/LayoutStoreContext";
+import { IdeaStoreProvider } from "@/contexts/IdeaStoreContext";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -29,23 +31,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <body>
         <ThemeProvider>
-          <LanguageProvider>
-            <SearchProvider>
-              <ProjectStoreProvider>
-                <LogStoreProvider>
-                  <VersionStoreProvider>
-                    <TaskStoreProvider>
-                      <MilestoneProvider>
-                        <LayoutStoreProvider>
-                          <AppShell>{children}</AppShell>
-                        </LayoutStoreProvider>
-                      </MilestoneProvider>
-                    </TaskStoreProvider>
-                  </VersionStoreProvider>
-                </LogStoreProvider>
-              </ProjectStoreProvider>
-            </SearchProvider>
-          </LanguageProvider>
+          <PreferenceProvider>
+            <LanguageProvider>
+              <SearchProvider>
+                <ProjectStoreProvider>
+                  <LogStoreProvider>
+                    <VersionStoreProvider>
+                      <TaskStoreProvider>
+                        <IdeaStoreProvider>
+                          <MilestoneProvider>
+                            <LayoutStoreProvider>
+                              <AppShell>{children}</AppShell>
+                            </LayoutStoreProvider>
+                          </MilestoneProvider>
+                        </IdeaStoreProvider>
+                      </TaskStoreProvider>
+                    </VersionStoreProvider>
+                  </LogStoreProvider>
+                </ProjectStoreProvider>
+              </SearchProvider>
+            </LanguageProvider>
+          </PreferenceProvider>
         </ThemeProvider>
       </body>
     </html>

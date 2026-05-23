@@ -1,10 +1,11 @@
-import type { GameProject, DevLog, Task, VersionRecord } from "@/lib/types";
+import type { GameProject, DevLog, Task, VersionRecord, IdeaCapsule } from "@/lib/types";
 
 /* ── 上线版本：全部数据清空，用户自己填充 ── */
 export const mockProjects: GameProject[] = [];
 export const mockDevLogs: DevLog[] = [];
 export const mockTasks: Task[] = [];
 export const mockVersions: VersionRecord[] = [];
+export const mockIdeas: IdeaCapsule[] = [];
 
 /* ─────────── 查询工具函数 ─────────── */
 export function getProjectBySlug(slug: string): GameProject | undefined {

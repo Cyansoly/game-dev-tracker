@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { Search, Plus, Bell, Menu } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Search, Plus, Bell, Menu, BookOpen, Lightbulb, ChevronDown } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSearch } from "@/contexts/SearchContext";
 import LogModal from "@/components/logs/LogModal";
+import IdeaModal from "@/components/inspirations/IdeaModal";
 import NotificationPanel from "./NotificationPanel";
 
 interface TopNavProps {
@@ -14,10 +15,38 @@ interface TopNavProps {
 
 export default function TopNav({ onMenuClick }: TopNavProps) {
   const pathname = usePathname();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const { openPalette } = useSearch();
-  const [showLogModal, setShowLogModal] = useState(false);
-  const [showNotif, setShowNotif] = useState(false);
+  const zh = lang === "zh";
+
+  const [showLogModal, setShowLogModal]   = useState(false);
+  const [showIdeaModal, setShowIdeaModal] = useState(false);
+  const [showDropdown, setShowDropdown]   = useState(false);
+  const [showNotif, setShowNotif]         = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  // Ctrl+I → open idea modal
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if ((e.ctrlKey || e.metaKey) && e.key === "i") {
+        e.preventDefault();
+        setShowIdeaModal(true);
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   const pages = t.topNav.pages as Record<string, { title: string; desc: string }>;
   const matched = Object.entries(pages)
@@ -56,7 +85,7 @@ export default function TopNav({ onMenuClick }: TopNavProps) {
         </div>
 
         <div className="flex items-center gap-1.5 md:gap-2">
-          {/* Search — icon only on mobile, full button on desktop */}
+          {/* Search */}
           <button
             onClick={openPalette}
             className="flex items-center gap-2 rounded-lg border px-2 py-1.5 text-xs transition-colors hover:border-blue-500/30 hover:bg-blue-500/5 md:px-3"
@@ -69,14 +98,47 @@ export default function TopNav({ onMenuClick }: TopNavProps) {
             </kbd>
           </button>
 
-          {/* Quick log */}
-          <button
-            onClick={() => setShowLogModal(true)}
-            className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-2 py-1.5 text-xs font-medium text-white transition-colors hover:bg-blue-500 md:px-3"
-          >
-            <Plus className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">{t.topNav.newLog}</span>
-          </button>
+          {/* Quick new — dropdown */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setShowDropdown((v) => !v)}
+              className="flex items-center gap-1 rounded-lg bg-blue-600 px-2 py-1.5 text-xs font-medium text-white transition-colors hover:bg-blue-500 md:px-3"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">{zh ? "新建" : "New"}</span>
+              <ChevronDown className="h-3 w-3 opacity-70" />
+            </button>
+
+            {showDropdown && (
+              <div
+                className="absolute right-0 top-full z-30 mt-1.5 w-44 rounded-xl border py-1 shadow-xl"
+                style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-color)" }}
+              >
+                <button
+                  onClick={() => { setShowLogModal(true); setShowDropdown(false); }}
+                  className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-sm transition-colors hover:bg-white/6"
+                  style={{ color: "var(--text-1)" }}
+                >
+                  <BookOpen className="h-4 w-4 shrink-0" style={{ color: "#3b82f6" }} />
+                  <div>
+                    <p className="text-xs font-medium">{zh ? "记录日志" : "Dev Log"}</p>
+                    <p className="text-[10px]" style={{ color: "var(--text-3)" }}>Ctrl+L</p>
+                  </div>
+                </button>
+                <button
+                  onClick={() => { setShowIdeaModal(true); setShowDropdown(false); }}
+                  className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-sm transition-colors hover:bg-white/6"
+                  style={{ color: "var(--text-1)" }}
+                >
+                  <Lightbulb className="h-4 w-4 shrink-0" style={{ color: "#eab308" }} />
+                  <div>
+                    <p className="text-xs font-medium">{zh ? "新建灵感" : "New Idea"}</p>
+                    <p className="text-[10px]" style={{ color: "var(--text-3)" }}>Ctrl+I</p>
+                  </div>
+                </button>
+              </div>
+            )}
+          </div>
 
           {/* Notification bell */}
           <div className="relative">
@@ -95,6 +157,10 @@ export default function TopNav({ onMenuClick }: TopNavProps) {
 
       {showLogModal && (
         <LogModal onClose={() => setShowLogModal(false)} />
+      )}
+
+      {showIdeaModal && (
+        <IdeaModal onClose={() => setShowIdeaModal(false)} />
       )}
     </>
   );
