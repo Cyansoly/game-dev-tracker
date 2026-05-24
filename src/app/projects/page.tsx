@@ -19,17 +19,17 @@ export default function ProjectsPage() {
   const [stageFilter, setStageFilter] = useState<string>("all");
   const [showModal, setShowModal] = useState(false);
 
-  const active = projects.filter((p) => !p.isArchived);
+  const active = projects;
   const filtered =
     stageFilter === "all" ? active : active.filter((p) => p.stage === stageFilter);
 
   const stageStyle: Record<string, string> = {
-    concept:    "bg-zinc-800/60 text-zinc-400 border-zinc-700/50",
-    prototype:  "bg-purple-500/8 text-purple-400 border-purple-500/20",
+    concept: "bg-zinc-800/60 text-zinc-400 border-zinc-700/50",
+    prototype: "bg-purple-500/8 text-purple-400 border-purple-500/20",
     production: "bg-blue-500/8 text-blue-400 border-blue-500/20",
-    polish:     "bg-cyan-500/8 text-cyan-400 border-cyan-500/20",
-    released:   "bg-green-500/8 text-green-400 border-green-500/20",
-    paused:     "bg-zinc-700/40 text-zinc-500 border-zinc-700/30",
+    polish: "bg-cyan-500/8 text-cyan-400 border-cyan-500/20",
+    released: "bg-green-500/8 text-green-400 border-green-500/20",
+    paused: "bg-zinc-700/40 text-zinc-500 border-zinc-700/30",
   };
 
   return (

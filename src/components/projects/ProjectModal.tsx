@@ -36,12 +36,12 @@ const PLATFORM_LABELS: Record<Platform, string> = {
 function defaultModules() {
   const now = new Date().toISOString().slice(0, 10);
   return [
-    { key: "art" as const,       label: "美术", progress: 0, weight: 1.2, updatedAt: now },
-    { key: "code" as const,      label: "程序", progress: 0, weight: 1.5, updatedAt: now },
-    { key: "level" as const,     label: "关卡", progress: 0, weight: 1.0, updatedAt: now },
-    { key: "audio" as const,     label: "音效", progress: 0, weight: 0.8, updatedAt: now },
+    { key: "art" as const, label: "美术", progress: 0, weight: 1.2, updatedAt: now },
+    { key: "code" as const, label: "程序", progress: 0, weight: 1.5, updatedAt: now },
+    { key: "level" as const, label: "关卡", progress: 0, weight: 1.0, updatedAt: now },
+    { key: "audio" as const, label: "音效", progress: 0, weight: 0.8, updatedAt: now },
     { key: "narrative" as const, label: "剧情", progress: 0, weight: 0.8, updatedAt: now },
-    { key: "qa" as const,        label: "测试", progress: 0, weight: 1.0, updatedAt: now },
+    { key: "qa" as const, label: "测试", progress: 0, weight: 1.0, updatedAt: now },
   ];
 }
 
@@ -155,13 +155,13 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
     released: "bg-green-500/15 text-green-300 border border-green-500/25", paused: "bg-zinc-700/40 text-zinc-500",
   };
   const momentumLabels: Record<DevMomentum, string> = {
-    idle:   zh ? "🌙 搁置中"   : "🌙 Idle",
+    idle: zh ? "🌙 搁置中" : "🌙 Idle",
     steady: zh ? "🌊 稳步推进" : "🌊 Steady",
     active: zh ? "⚡ 高度活跃" : "⚡ Active",
     crunch: zh ? "🔥 全力攻关" : "🔥 Crunch",
   };
   const momentumColors: Record<DevMomentum, string> = {
-    idle:   "bg-zinc-700/60 text-zinc-400",
+    idle: "bg-zinc-700/60 text-zinc-400",
     steady: "bg-blue-500/15 text-blue-300 border border-blue-500/25",
     active: "bg-green-500/15 text-green-300 border border-green-500/25",
     crunch: "bg-orange-500/15 text-orange-300 border border-orange-500/25",
