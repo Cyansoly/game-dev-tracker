@@ -170,3 +170,97 @@ export interface IdeaCapsule {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface GameProject {
+  id: string;
+  slug: string;
+  name: string;
+  tagline?: string;
+  description: string;
+  genre: string;
+  tags: string[];
+  icon?: string;
+  coverColor: string;
+
+  stage: ProjectStage;
+  currentVersion: string;
+  momentum: DevMomentum;
+  overallProgress: number;
+  progressModules: ProgressModule[];
+
+  platforms: Platform[];
+  engine?: string;
+  languages?: string[];
+
+  startedAt?: string;
+  targetReleaseDate?: string;
+  plannedDurationDays?: number;
+
+  teamSize?: number;
+  role?: string;
+  collaborators?: string[];
+
+  nextPlan?: string;
+  techStackNotes?: string;
+  pitch?: string;
+  references?: string;
+
+  manualHoursOffset?: number;
+
+  links: ProjectLink[];
+  isArchived: boolean;
+  createdAt: string;
+  updatedAt: string;
+
+  createdByName?: string;
+  updatedByName?: string;
+}
+
+export interface DevLog {
+  id: string;
+  projectId: string;
+  date: string;
+  tags: DevLogTag[];
+  completed: string;
+  blockers?: string;
+  tomorrowPlan?: string;
+  mood: Mood;
+  durationMinutes: number;
+  createdAt: string;
+
+  authorName?: string;
+  updatedAt?: string;
+}
+
+export interface Task {
+  id: string;
+  projectId: string;
+  title: string;
+  description?: string;
+  status: TaskStatus;
+  priority: TaskPriority;
+  tags: string[];
+  dueDate?: string;
+  order: number;
+  createdAt: string;
+
+  updatedAt?: string;
+  createdByName?: string;
+  assigneeName?: string;
+  completedByName?: string;
+}
+
+export interface IdeaCapsule {
+  id: string;
+  projectId?: string;
+  title: string;
+  content: string;
+  category?: IdeaCategory;
+  tags?: string[];
+  color?: string;
+  pinned?: boolean;
+  createdAt: string;
+  updatedAt: string;
+
+  createdByName?: string;
+}

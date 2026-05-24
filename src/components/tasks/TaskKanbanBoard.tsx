@@ -22,46 +22,46 @@ import TaskModal from "./TaskModal";
 
 /* ─────────────────────────────── helpers ─── */
 const PRIORITY_DOT: Record<TaskPriority, string> = {
-  low:    "bg-zinc-500",
+  low: "bg-zinc-500",
   medium: "bg-amber-400",
-  high:   "bg-orange-500",
+  high: "bg-orange-500",
   urgent: "bg-red-500",
 };
 const PRIORITY_COLOR: Record<TaskPriority, string> = {
-  low:    "#71717a",
+  low: "#71717a",
   medium: "#fbbf24",
-  high:   "#f97316",
+  high: "#f97316",
   urgent: "#ef4444",
 };
 
 const COL_CONFIG = [
   {
-    id: "todo"        as TaskStatus,
+    id: "todo" as TaskStatus,
     emoji: "📋",
     color: "#71717a",
-    bg:    "rgba(113,113,122,0.08)",
-    topBar:"#52525b",
+    bg: "rgba(113,113,122,0.08)",
+    topBar: "#52525b",
   },
   {
     id: "in_progress" as TaskStatus,
     emoji: "⚡",
     color: "#60a5fa",
-    bg:    "rgba(96,165,250,0.06)",
-    topBar:"#3b82f6",
+    bg: "rgba(96,165,250,0.06)",
+    topBar: "#3b82f6",
   },
   {
-    id: "review"      as TaskStatus,
+    id: "review" as TaskStatus,
     emoji: "🔍",
     color: "#a78bfa",
-    bg:    "rgba(167,139,250,0.06)",
-    topBar:"#8b5cf6",
+    bg: "rgba(167,139,250,0.06)",
+    topBar: "#8b5cf6",
   },
   {
-    id: "done"        as TaskStatus,
+    id: "done" as TaskStatus,
     emoji: "✅",
     color: "#4ade80",
-    bg:    "rgba(74,222,128,0.06)",
-    topBar:"#22c55e",
+    bg: "rgba(74,222,128,0.06)",
+    topBar: "#22c55e",
   },
 ];
 
@@ -143,9 +143,9 @@ function RichTaskCard({
                   : daysLeft! <= 3
                     ? `${daysLeft}天后截止`
                     : new Date(task.dueDate).toLocaleDateString(
-                        lang === "zh" ? "zh-CN" : "en-US",
-                        { month: "short", day: "numeric" }
-                      )}
+                      lang === "zh" ? "zh-CN" : "en-US",
+                      { month: "short", day: "numeric" }
+                    )}
             </span>
           )}
         </div>
@@ -171,14 +171,36 @@ function RichTaskCard({
         )}
 
         {/* Project label */}
-        <div className="flex items-center gap-1.5">
-          <span
-            className="h-1.5 w-1.5 rounded-full shrink-0"
-            style={{ backgroundColor: projectColor }}
-          />
-          <span className="truncate text-[10px]" style={{ color: "var(--text-3)" }}>
-            {projectName}
-          </span>
+        <div
+          className="mt-3 flex items-center gap-1.5 text-[11px]"
+          style={{ color: "var(--text-3)" }}
+        >
+          <FolderOpen className="h-3 w-3" />
+          {projectName}
+        </div>
+
+        {/* User meta */}
+        <div
+          className="mt-2 flex flex-wrap gap-1.5 text-[10px]"
+          style={{ color: "var(--text-3)" }}
+        >
+          {task.assigneeName && (
+            <span
+              className="rounded-full border px-2 py-0.5"
+              style={{ borderColor: "var(--border-color)" }}
+            >
+              负责人：{task.assigneeName}
+            </span>
+          )}
+
+          {task.createdByName && (
+            <span
+              className="rounded-full border px-2 py-0.5"
+              style={{ borderColor: "var(--border-color)" }}
+            >
+              创建：{task.createdByName}
+            </span>
+          )}
         </div>
       </div>
     </motion.div>
@@ -369,6 +391,14 @@ function ListRow({
       <p className="flex-1 truncate text-sm font-medium" style={{ color: "var(--text-1)" }}>
         {task.title}
       </p>
+
+      <div
+        className="mt-1 flex gap-2 text-[10px]"
+        style={{ color: "var(--text-3)" }}
+      >
+        {task.assigneeName && <span>负责人：{task.assigneeName}</span>}
+        {task.createdByName && <span>创建：{task.createdByName}</span>}
+      </div>
 
       {/* Tags */}
       <div className="hidden items-center gap-1 sm:flex">
@@ -561,9 +591,9 @@ function FocusView({
   colLabels: Record<TaskStatus, string>;
 }) {
   const inProgress = tasks.filter((t) => t.status === "in_progress");
-  const todo       = tasks.filter((t) => t.status === "todo");
-  const review     = tasks.filter((t) => t.status === "review");
-  const done       = tasks.filter((t) => t.status === "done");
+  const todo = tasks.filter((t) => t.status === "todo");
+  const review = tasks.filter((t) => t.status === "review");
+  const done = tasks.filter((t) => t.status === "done");
 
   const SideCol = ({ items, status, label, color }: { items: Task[]; status: TaskStatus; label: string; color: string }) => (
     <div className="flex flex-col gap-2">
@@ -697,10 +727,10 @@ export default function TaskKanbanBoard({ projectId }: TaskKanbanBoardProps) {
   }
 
   const colLabels: Record<TaskStatus, string> = {
-    todo:        t.tasks.todo,
+    todo: t.tasks.todo,
     in_progress: t.tasks.inProgress,
-    review:      t.tasks.review,
-    done:        t.tasks.done,
+    review: t.tasks.review,
+    done: t.tasks.done,
   };
 
   const total = filtered.length;

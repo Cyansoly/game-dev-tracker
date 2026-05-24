@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Plus, BookOpen, CheckSquare, GitBranch, MoreHorizontal, Archive, Trash2 } from "lucide-react";
 import type { GameProject, ProjectStage, DevMomentum, Platform } from "@/lib/types";
 import { useProjectStore } from "@/contexts/ProjectStoreContext";
@@ -38,7 +39,7 @@ const STAGE_OPTIONS = (zh: boolean): { value: ProjectStage; label: string; color
 ];
 
 const MOMENTUM_OPTIONS = (zh: boolean): { value: DevMomentum; label: string; color: string }[] => [
-  { value: "idle",   label: zh ? "🌙 搁置中"   : "🌙 Idle",   color: "#71717a" },
+  { value: "idle", label: zh ? "🌙 搁置中" : "🌙 Idle", color: "#71717a" },
   { value: "steady", label: zh ? "🌊 稳步推进" : "🌊 Steady", color: "#60a5fa" },
   { value: "active", label: zh ? "⚡ 高度活跃" : "⚡ Active", color: "#4ade80" },
   { value: "crunch", label: zh ? "🔥 全力攻关" : "🔥 Crunch", color: "#fb923c" },
@@ -49,9 +50,10 @@ interface ProjectHeaderProps {
 }
 
 export default function ProjectHeader({ project }: ProjectHeaderProps) {
+  const router = useRouter();
   const { lang } = useLanguage();
   const zh = lang === "zh";
-  const { updateProjectField, updateOverallProgress } = useProjectStore();
+  const { updateProjectField, updateOverallProgress, deleteProject } = useProjectStore();
   const { addVersion } = useVersionStore();
 
   const [showLogModal, setShowLogModal] = useState(false);
@@ -61,6 +63,20 @@ export default function ProjectHeader({ project }: ProjectHeaderProps) {
 
   function field<K extends keyof GameProject>(key: K) {
     return (val: GameProject[K]) => updateProjectField(project.id, key, val);
+  }
+
+  function handleDeleteProject() {
+    const ok = window.confirm(
+      zh
+        ? `确定要删除「${project.name}」吗？这个操作不能撤销。`
+        : `Delete "${project.name}"? This cannot be undone.`
+    );
+
+    if (!ok) return;
+
+    deleteProject(project.id);
+    setShowMore(false);
+    router.push("/projects");
   }
 
   return (
@@ -198,6 +214,14 @@ export default function ProjectHeader({ project }: ProjectHeaderProps) {
                       >
                         <Archive className="h-3.5 w-3.5" />
                         {project.isArchived ? (zh ? "取消归档" : "Unarchive") : (zh ? "归档项目" : "Archive")}
+                      </button>
+                      <button
+                        onClick={handleDeleteProject}
+                        className="flex w-full items-center gap-2 px-3 py-2.5 text-xs hover:bg-red-500/10"
+                        style={{ color: "#ef4444" }}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        {zh ? "删除项目" : "Delete project"}
                       </button>
                     </motion.div>
                   )}

@@ -8,6 +8,7 @@ import { useSearch } from "@/contexts/SearchContext";
 import LogModal from "@/components/logs/LogModal";
 import IdeaModal from "@/components/inspirations/IdeaModal";
 import NotificationPanel from "./NotificationPanel";
+import WorkspaceUserSwitcher from "@/components/workspace/WorkspaceUserSwitcher";
 
 interface TopNavProps {
   onMenuClick?: () => void;
@@ -97,6 +98,8 @@ export default function TopNav({ onMenuClick }: TopNavProps) {
               Ctrl+K
             </kbd>
           </button>
+
+          <WorkspaceUserSwitcher />
 
           {/* Quick new — dropdown */}
           <div className="relative" ref={dropdownRef}>

@@ -1,10 +1,24 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback, useMemo, type ReactNode } from "react";
-import { computeAchievements, getStreak, getTotalHours, type Achievement } from "@/lib/stats";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  type ReactNode,
+} from "react";
+import {
+  computeAchievements,
+  getStreak,
+  getTotalHours,
+  type Achievement,
+} from "@/lib/stats";
 import { useLogStore } from "./LogStoreContext";
 import { useProjectStore } from "./ProjectStoreContext";
 import { useTaskStore } from "./TaskStoreContext";
+import { useWorkspace } from "@/contexts/WorkspaceContext";
 
 interface MilestoneContextValue {
   achievements: Achievement[];
@@ -18,75 +32,115 @@ interface MilestoneContextValue {
 
 const Ctx = createContext<MilestoneContextValue | null>(null);
 
-const LS_GOAL   = "devtracker_weekly_goal";
-const LS_START  = "devtracker_tracking_start";
-const LS_SEEN   = "devtracker_seen_achievements";
-
-function loadSeen(): Set<string> {
-  try {
-    const raw = localStorage.getItem(LS_SEEN);
-    return raw ? new Set(JSON.parse(raw)) : new Set();
-  } catch { return new Set(); }
+function keyFor(
+  workspaceId: string | null,
+  viewingUserName: string | null,
+  suffix: string
+) {
+  return `devtracker_${workspaceId ?? "none"}_${viewingUserName ?? "none"}_${suffix}`;
 }
-function saveSeen(ids: Set<string>) {
-  try { localStorage.setItem(LS_SEEN, JSON.stringify([...ids])); } catch {}
+
+function loadSeen(key: string): Set<string> {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch {
+    return new Set();
+  }
+}
+
+function saveSeen(key: string, ids: Set<string>) {
+  try {
+    localStorage.setItem(key, JSON.stringify([...ids]));
+  } catch { }
 }
 
 export function MilestoneProvider({ children }: { children: ReactNode }) {
+  const { workspaceId, viewingUserName } = useWorkspace();
   const { logs } = useLogStore();
   const { projects } = useProjectStore();
-  const { tasks } = useTaskStore();
+  const { personalTasks } = useTaskStore();
 
   const [weeklyHoursGoal, setWeeklyHoursGoalState] = useState(20);
   const [trackingStartDate, setTrackingStartDateState] = useState("");
   const [seenIds, setSeenIds] = useState<Set<string>>(new Set());
   const [newlyUnlocked, setNewlyUnlocked] = useState<Achievement | null>(null);
 
-  // Hydrate from localStorage
+  const goalKey = keyFor(workspaceId, viewingUserName, "weekly_goal");
+  const startKey = keyFor(workspaceId, viewingUserName, "tracking_start");
+  const seenKey = keyFor(workspaceId, viewingUserName, "seen_achievements");
+
   useEffect(() => {
-    const g = localStorage.getItem(LS_GOAL);
-    if (g) setWeeklyHoursGoalState(Number(g));
-    const s = localStorage.getItem(LS_START);
-    if (s) setTrackingStartDateState(s);
-    setSeenIds(loadSeen());
-  }, []);
+    const g = localStorage.getItem(goalKey);
+    setWeeklyHoursGoalState(g ? Number(g) : 20);
+
+    const s = localStorage.getItem(startKey);
+    setTrackingStartDateState(s ?? "");
+
+    setSeenIds(loadSeen(seenKey));
+    setNewlyUnlocked(null);
+  }, [goalKey, startKey, seenKey]);
 
   const streak = useMemo(() => getStreak(logs), [logs]);
-  const totalHours = useMemo(() => getTotalHours(logs, projects), [logs, projects]);
-  const achievements = useMemo(
-    () => computeAchievements(logs, projects, tasks, totalHours, streak),
-    [logs, projects, tasks, totalHours, streak]
+
+  const totalHours = useMemo(
+    () => getTotalHours(logs, projects),
+    [logs, projects]
   );
 
-  // Detect newly unlocked achievements
+  const achievements = useMemo(
+    () => computeAchievements(logs, projects, personalTasks, totalHours, streak),
+    [logs, projects, personalTasks, totalHours, streak]
+  );
+
   useEffect(() => {
     const unlocked = achievements.filter((a) => a.unlocked && !seenIds.has(a.id));
+
     if (unlocked.length > 0) {
       setNewlyUnlocked(unlocked[0]);
-      const next = new Set([...seenIds, ...unlocked.map((a) => a.id)]);
+
+      const next = new Set([
+        ...seenIds,
+        ...unlocked.map((a) => a.id),
+      ]);
+
       setSeenIds(next);
-      saveSeen(next);
+      saveSeen(seenKey, next);
     }
-  }, [achievements]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [achievements, seenIds, seenKey]);
 
-  const dismissNew = useCallback(() => setNewlyUnlocked(null), []);
-
-  const setWeeklyHoursGoal = useCallback((h: number) => {
-    setWeeklyHoursGoalState(h);
-    localStorage.setItem(LS_GOAL, String(h));
+  const dismissNew = useCallback(() => {
+    setNewlyUnlocked(null);
   }, []);
 
-  const setTrackingStartDate = useCallback((d: string) => {
-    setTrackingStartDateState(d);
-    localStorage.setItem(LS_START, d);
-  }, []);
+  const setWeeklyHoursGoal = useCallback(
+    (h: number) => {
+      setWeeklyHoursGoalState(h);
+      localStorage.setItem(goalKey, String(h));
+    },
+    [goalKey]
+  );
+
+  const setTrackingStartDate = useCallback(
+    (d: string) => {
+      setTrackingStartDateState(d);
+      localStorage.setItem(startKey, d);
+    },
+    [startKey]
+  );
 
   return (
-    <Ctx.Provider value={{
-      achievements, newlyUnlocked, dismissNew,
-      weeklyHoursGoal, setWeeklyHoursGoal,
-      trackingStartDate, setTrackingStartDate,
-    }}>
+    <Ctx.Provider
+      value={{
+        achievements,
+        newlyUnlocked,
+        dismissNew,
+        weeklyHoursGoal,
+        setWeeklyHoursGoal,
+        trackingStartDate,
+        setTrackingStartDate,
+      }}
+    >
       {children}
     </Ctx.Provider>
   );

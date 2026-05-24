@@ -8,6 +8,7 @@ import AnimatedPageWrapper from "@/components/ui/AnimatedPageWrapper";
 import StatsCard from "@/components/ui/StatsCard";
 import AnalyticsToolbar, { type DaysFilter } from "@/components/analytics/AnalyticsToolbar";
 import ProjectCompareBars from "@/components/analytics/ProjectCompareBars";
+import { useWorkspace } from "@/contexts/WorkspaceContext";
 
 /* Recharts components require browser environment — disable SSR */
 const DailyTrendChart = dynamic(() => import("@/components/analytics/DailyTrendChart"), { ssr: false });
@@ -25,6 +26,7 @@ import {
 } from "@/lib/analytics";
 
 export default function AnalyticsPage() {
+  const { viewingUserName } = useWorkspace();
   const { t } = useLanguage();
   const a = t.analytics;
   const { logs: allLogs } = useLogStore();
@@ -78,7 +80,7 @@ export default function AnalyticsPage() {
   /* ─── Animation stagger ─── */
   const cardVariants = {
     hidden: { opacity: 0, y: 16 },
-    show:   { opacity: 1, y: 0 },
+    show: { opacity: 1, y: 0 },
   };
 
   return (
@@ -88,6 +90,9 @@ export default function AnalyticsPage() {
         <h2 className="text-xl font-bold" style={{ color: "var(--text-1)" }}>
           {a.title}
         </h2>
+        <p className="mt-1 text-xs" style={{ color: "var(--text-3)" }}>
+          当前查看：{viewingUserName ?? "未选择用户"} 的个人数据
+        </p>
         <p className="mt-0.5 text-sm" style={{ color: "var(--text-3)" }}>
           {a.desc}
         </p>

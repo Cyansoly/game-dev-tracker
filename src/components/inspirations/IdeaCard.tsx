@@ -11,13 +11,13 @@ import { cn } from "@/lib/cn";
 import IdeaModal from "./IdeaModal";
 
 const CATEGORY_LABELS: Record<IdeaCategory, { zh: string; en: string }> = {
-  gameplay:  { zh: "玩法",   en: "Gameplay" },
-  art:       { zh: "美术",   en: "Art" },
-  story:     { zh: "剧情",   en: "Story" },
-  audio:     { zh: "音效",   en: "Audio" },
-  tech:      { zh: "技术",   en: "Tech" },
-  marketing: { zh: "推广",   en: "Marketing" },
-  other:     { zh: "其他",   en: "Other" },
+  gameplay: { zh: "玩法", en: "Gameplay" },
+  art: { zh: "美术", en: "Art" },
+  story: { zh: "剧情", en: "Story" },
+  audio: { zh: "音效", en: "Audio" },
+  tech: { zh: "技术", en: "Tech" },
+  marketing: { zh: "推广", en: "Marketing" },
+  other: { zh: "其他", en: "Other" },
 };
 
 interface IdeaCardProps {
@@ -87,7 +87,19 @@ export default function IdeaCard({ idea, index = 0 }: IdeaCardProps) {
         {/* Footer: date + actions */}
         <div className="flex items-center justify-between">
           <span className="num text-[10px]" style={{ color: "var(--text-3)" }}>
-            {idea.createdAt.slice(0, 10)}
+            <span>{idea.createdAt.slice(0, 10)}</span>
+
+            {idea.createdByName && (
+              <span
+                className="rounded-full border px-2 py-0.5"
+                style={{
+                  borderColor: "var(--border-color)",
+                  color: "var(--text-3)",
+                }}
+              >
+                添加：{idea.createdByName}
+              </span>
+            )}
           </span>
 
           {/* Action buttons — appear on hover */}

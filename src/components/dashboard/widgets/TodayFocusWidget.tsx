@@ -35,7 +35,7 @@ function StatPill({
 
 export default function TodayFocusWidget() {
   const { logs } = useLogStore();
-  const { tasks } = useTaskStore();
+  const { personalTasks: tasks } = useTaskStore();
   const { projects } = useProjectStore();
   const { lang } = useLanguage();
   const zh = lang === "zh";

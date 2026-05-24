@@ -1,8 +1,15 @@
 "use client";
 
 import {
-  createContext, useContext, useState, useCallback, useEffect, type ReactNode,
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+  type ReactNode,
 } from "react";
+import { supabase } from "@/lib/supabase/client";
+import { useWorkspace } from "@/contexts/WorkspaceContext";
 import type { IdeaCapsule } from "@/lib/types";
 
 interface IdeaStoreContextValue {
@@ -14,101 +21,207 @@ interface IdeaStoreContextValue {
   togglePin: (id: string) => void;
 }
 
+type IdeaRow = {
+  id: string;
+  workspace_id: string;
+  title: string;
+  content: string | null;
+  tags: string[] | null;
+  created_by_name: string;
+  payload: Partial<IdeaCapsule> | null;
+  created_at: string;
+  updated_at: string;
+};
+
 const Ctx = createContext<IdeaStoreContextValue | null>(null);
 
-const LS_KEY = "devtracker_ideas_v3";
-
-function stamp() {
-  return new Date().toISOString();
+function makeId() {
+  return crypto.randomUUID();
 }
 
-function load(): IdeaCapsule[] {
-  try {
-    const raw = localStorage.getItem(LS_KEY);
-    if (raw) return JSON.parse(raw);
-    return [];
-  } catch {
-    return [];
-  }
-}
+function mapIdea(row: IdeaRow): IdeaCapsule {
+  const payload = row.payload ?? {};
 
-function save(ideas: IdeaCapsule[]) {
-  try {
-    localStorage.setItem(LS_KEY, JSON.stringify(ideas));
-  } catch {}
+  return {
+    ...payload,
+    id: row.id,
+    title: row.title,
+    content: row.content ?? payload.content ?? "",
+    tags: row.tags ?? payload.tags ?? [],
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    createdByName: row.created_by_name,
+  };
 }
 
 export function IdeaStoreProvider({ children }: { children: ReactNode }) {
+  const { workspaceId, localUserName } = useWorkspace();
   const [ideas, setIdeas] = useState<IdeaCapsule[]>([]);
 
-  useEffect(() => {
-    setIdeas(load());
-  }, []);
+  const loadIdeas = useCallback(async () => {
+    if (!workspaceId) {
+      setIdeas([]);
+      return;
+    }
 
-  const mutate = useCallback((fn: (prev: IdeaCapsule[]) => IdeaCapsule[]) => {
-    setIdeas((prev) => {
-      const next = fn(prev);
-      save(next);
-      return next;
-    });
-  }, []);
+    const { data, error } = await supabase
+      .from("ideas")
+      .select("*")
+      .eq("workspace_id", workspaceId)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("load ideas failed", error);
+      return;
+    }
+
+    setIdeas(((data ?? []) as IdeaRow[]).map(mapIdea));
+  }, [workspaceId]);
+
+  useEffect(() => {
+    void loadIdeas();
+  }, [loadIdeas]);
 
   const addIdea = useCallback(
     (data: Omit<IdeaCapsule, "id" | "createdAt" | "updatedAt">) => {
-      const now = stamp();
+      if (!workspaceId) {
+        console.error("add idea failed: missing workspaceId");
+        alert("还没有加入工作区，无法保存灵感。");
+        return;
+      }
+
+      if (!localUserName) {
+        console.error("add idea failed: missing localUserName");
+        alert("还没有设置用户名，无法保存灵感。");
+        return;
+      }
+
+      const now = new Date().toISOString();
+
       const newIdea: IdeaCapsule = {
         ...data,
-        id: `idea-${Date.now()}`,
+        id: makeId(),
         createdAt: now,
         updatedAt: now,
+        createdByName: localUserName,
       };
-      mutate((prev) => [newIdea, ...prev]);
+
+      setIdeas((prev) => [newIdea, ...prev]);
+
+      void (async () => {
+        const { error } = await supabase.from("ideas").insert({
+          id: newIdea.id,
+          workspace_id: workspaceId,
+          title: newIdea.title,
+          content: newIdea.content,
+          tags: newIdea.tags ?? [],
+          created_by_name: localUserName,
+          payload: newIdea,
+        });
+
+        if (error) {
+          console.error("add idea failed", error);
+          alert(`保存灵感失败：${error.message}`);
+          await loadIdeas();
+        }
+      })();
     },
-    [mutate]
+    [workspaceId, localUserName, loadIdeas]
   );
 
   const updateIdea = useCallback(
     (id: string, patch: Partial<IdeaCapsule>) => {
-      mutate((prev) =>
-        prev.map((i) =>
-          i.id === id ? { ...i, ...patch, updatedAt: stamp() } : i
-        )
+      if (!workspaceId) return;
+
+      setIdeas((prev) =>
+        prev.map((idea) => {
+          if (idea.id !== id) return idea;
+
+          const next: IdeaCapsule = {
+            ...idea,
+            ...patch,
+            updatedAt: new Date().toISOString(),
+          };
+
+          void (async () => {
+            const { error } = await supabase
+              .from("ideas")
+              .update({
+                title: next.title,
+                content: next.content,
+                tags: next.tags ?? [],
+                payload: next,
+                updated_at: new Date().toISOString(),
+              })
+              .eq("id", id)
+              .eq("workspace_id", workspaceId);
+
+            if (error) {
+              console.error("update idea failed", error);
+              alert(`更新灵感失败：${error.message}`);
+              await loadIdeas();
+            }
+          })();
+
+          return next;
+        })
       );
     },
-    [mutate]
+    [workspaceId, loadIdeas]
   );
 
   const removeIdea = useCallback(
     (id: string) => {
-      mutate((prev) => prev.filter((i) => i.id !== id));
+      if (!workspaceId) return;
+
+      const prevIdeas = ideas;
+      setIdeas((prev) => prev.filter((i) => i.id !== id));
+
+      void (async () => {
+        const { error } = await supabase
+          .from("ideas")
+          .delete()
+          .eq("id", id)
+          .eq("workspace_id", workspaceId);
+
+        if (error) {
+          console.error("remove idea failed", error);
+          alert(`删除灵感失败：${error.message}`);
+          setIdeas(prevIdeas);
+        }
+      })();
     },
-    [mutate]
+    [workspaceId, ideas]
   );
 
   const moveToProject = useCallback(
     (id: string, projectId: string | undefined) => {
-      mutate((prev) =>
-        prev.map((i) =>
-          i.id === id ? { ...i, projectId, updatedAt: stamp() } : i
-        )
-      );
+      updateIdea(id, { projectId });
     },
-    [mutate]
+    [updateIdea]
   );
 
   const togglePin = useCallback(
     (id: string) => {
-      mutate((prev) =>
-        prev.map((i) =>
-          i.id === id ? { ...i, pinned: !i.pinned, updatedAt: stamp() } : i
-        )
-      );
+      const idea = ideas.find((i) => i.id === id);
+      if (!idea) return;
+
+      updateIdea(id, { pinned: !idea.pinned });
     },
-    [mutate]
+    [ideas, updateIdea]
   );
 
   return (
-    <Ctx.Provider value={{ ideas, addIdea, updateIdea, removeIdea, moveToProject, togglePin }}>
+    <Ctx.Provider
+      value={{
+        ideas,
+        addIdea,
+        updateIdea,
+        removeIdea,
+        moveToProject,
+        togglePin,
+      }}
+    >
       {children}
     </Ctx.Provider>
   );
@@ -116,6 +229,10 @@ export function IdeaStoreProvider({ children }: { children: ReactNode }) {
 
 export function useIdeaStore() {
   const ctx = useContext(Ctx);
-  if (!ctx) throw new Error("useIdeaStore must be inside IdeaStoreProvider");
+
+  if (!ctx) {
+    throw new Error("useIdeaStore must be inside IdeaStoreProvider");
+  }
+
   return ctx;
 }

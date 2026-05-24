@@ -17,7 +17,7 @@ const PRIORITY_COLOR: Record<string, string> = {
 };
 
 export default function TaskFocusWidget() {
-  const { tasks } = useTaskStore();
+  const { personalTasks: tasks } = useTaskStore();
   const { projects } = useProjectStore();
   const { lang } = useLanguage();
   const zh = lang === "zh";
