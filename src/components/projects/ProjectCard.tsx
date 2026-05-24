@@ -153,7 +153,7 @@ export default function ProjectCard({ project, index = 0 }: ProjectCardProps) {
           </div>
 
           <ProgressRing
-            value={project.overallProgress}
+            progress={project.overallProgress}
             size={48}
             strokeWidth={5}
             color={project.coverColor}
